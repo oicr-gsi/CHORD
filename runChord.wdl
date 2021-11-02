@@ -1,7 +1,6 @@
 version 1.0
 
 workflow CHORD {
-    # TODO: add Rscript dependencies under meta 
     meta {
         author: "Vivek Alamuri"
         email: "valamuri@oicr.on.ca"
@@ -13,23 +12,21 @@ workflow CHORD {
             }
         ]
     }
-    call runCHORD
 
-    # TODO: does not allow to pass inputs from workflow level 
-    # input {
-    #     String wkdir
-    #     String snvPattern
-    #     String indelPattern
-    #     String svPattern
-    # }
+    input {
+        String wkdir
+        String snvPattern
+        String indelPattern
+        String svPattern
+    }
 
-    # call runCHORD {
-    #     input:
-    #         wkdir = wkdir
-    #         snvPattern = snvPattern
-    #         indelPattern = indelPattern
-    #         svPattern = svPattern
-    # }
+    call runCHORD {
+        input:
+            wkdir = wkdir,
+            snvPattern = snvPattern,
+            indelPattern = indelPattern,
+            svPattern = svPattern
+    }
 }
 
 task runCHORD {
