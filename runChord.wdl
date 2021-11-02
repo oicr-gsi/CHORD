@@ -15,7 +15,7 @@ workflow CHORD {
     }
     call runCHORD
 
-    # TODO: does not allow to pass inputs from worflow level 
+    # TODO: does not allow to pass inputs from workflow level 
     # input {
     #     String wkdir
     #     String snvPattern
