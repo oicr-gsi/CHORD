@@ -14,41 +14,36 @@ workflow CHORD {
     }
 
     input {
-        String wkdir
-        String snvPattern
-        String indelPattern
-        String svPattern
+        File snvFile
+        File indelFile
+        File svFile
     }
 
     call runCHORD {
         input:
-            wkdir = wkdir,
-            snvPattern = snvPattern,
-            indelPattern = indelPattern,
-            svPattern = svPattern
+            snvFile = snvFile,
+            indelFile = indelFile,
+            svFile = svFile
     }
 }
 
 task runCHORD {
     input {
-        String wkdir
-        String snvPattern
-        String indelPattern
-        String svPattern
+        File snvFile
+        File indelFile
+        File svFile
     }
 
     parameter_meta {
-        wkdir: "required; working directory where vcfs folder is located"
-        snvPattern: "SNV VCF files pattern; default: *snp.vcf"
-        indelPattern: "indel VCF files pattern; default: *indel*"
-        svPattern: "SV VCF files pattern; default: *delly.merged.vcf.gz"
+        snvFile: "SNV VCF filepath"
+        indelFile: "indel VCF filepath"
+        svFile: "SV VCF filepath"
     }
 
-    # echo variables for now, will be passed to R script later
     command {
-        echo 'path: -w ~{wkdir}, snvPattern: -n ~{snvPattern}, indelPattern: -i ~{indelPattern},
-        svPattern: -v ~{svPattern}'
+        Rscript runCHORDScript.R -n ~{snvFile} -i ~{indelFile} -v ~{svFile}
     }
-
 }
 
+# to validate
+# java -jar womtool-69.jar validate wdls/CHORD-v1_wkflow_inputs.wdl

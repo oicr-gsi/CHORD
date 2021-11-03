@@ -1,17 +1,14 @@
 library(optparse)
 
 option_list = list(
-  make_option(c("-w", "--wkdir"), type="character", default=NULL,
-              help="**required** working directory where vcfs folder is located", metavar="character"),
+  make_option(c("-n", "--snv"), type="character", default=NULL,
+              help="path to SNV file", metavar="character"),
   
-  make_option(c("-n", "--snvPattern"), type="character", default="*snp.vcf",
-              help="SNV files pattern; default: *snp.vcf", metavar="character"),
+  make_option(c("-v", "--sv"), type="character", default=NULL,
+              help="path to indel file", metavar="character"),
   
-  make_option(c("-v", "--svPattern"), type="character", default="*delly.merged.vcf.gz",
-              help="SV files pattern; default: *delly.merged.vcf.gz", metavar="character"),
-  
-  make_option(c("-i", "--indelPattern"), type="character", default="*indel*",
-              help="indel files pattern; default: *indel*", metavar="character")
+  make_option(c("-i", "--indel"), type="character", default=NULL,
+              help="path to SV file", metavar="character")
   # make_option(c("-i", "--snv"), type="character", default="chord_pred.txt",
   #             help="predictions output file name; default: chord_pred.txt", metavar="character")
   # make_option(c("-v", "--sv"), type="character", default="chord_pred.txt",
@@ -22,26 +19,19 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list);
 args = parse_args(opt_parser)
 
-workingDir <- args$wkdir
-snvPattern <- args$snvPattern
-svPattern <- args$svPattern
-indelPattern <- args$indelPattern
-
-mergedContextsFileName <- "merged_contexts.txt"
-predictionOutputFileName <- "chord_predictions.txt"
+snv <- args$snv
+sv <- args$sv
+indel <- args$indel
 
 # libraries imported after command line arguments so that when --help is called, these are not loaded
 library(CHORD)
 library(BSgenome.Hsapiens.UCSC.hg19)
 options(stringsAsFactors=F)
 
-setwd(workingDir)
-
+setwd(getcwd())
 
 vcf_files <- data.frame(
-  snv=list.files('vcf', pattern=snvPattern, full.names=T),
-  sv=list.files('vcf', pattern=svPattern, full.names=T),
-  indel=list.files('vcf', pattern=indelPattern, full.names = T)
+  snv=snv, sv=sv, indel=indel
 )
 
 vcf_files$sample <- sapply(strsplit(basename(vcf_files$snv),'_'),`[`,1)
@@ -77,6 +67,9 @@ l_contexts <- lapply(context_files, function(i){
 
 ## Merge the contexts into a matrix
 merged_contexts <- do.call(rbind, l_contexts)
+
+mergedContextsFileName <- "merged_contexts.txt"
+predictionOutputFileName <- "chord_predictions.txt"
 
 ## Write to output directory
 write.table(merged_contexts, paste0("output", "/", mergedContextsFileName), sep='\t', quote=F)
