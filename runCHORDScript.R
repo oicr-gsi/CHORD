@@ -9,10 +9,6 @@ option_list = list(
   
   make_option(c("-i", "--indel"), type="character", default=NULL,
               help="path to SV file", metavar="character")
-  # make_option(c("-i", "--snv"), type="character", default="chord_pred.txt",
-  #             help="predictions output file name; default: chord_pred.txt", metavar="character")
-  # make_option(c("-v", "--sv"), type="character", default="chord_pred.txt",
-  #             help="predictions output file name; default: chord_pred.txt", metavar="character")
 );
 
 # get command line arguments
