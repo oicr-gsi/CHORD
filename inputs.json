@@ -1,0 +1,6 @@
+{
+  "CHORD.snvFile": "/.mounts/labs/CGI/scratch/testCHORDWdl/PD4116_snv_indel.vcf.gz",
+  "CHORD.indelFile": "/.mounts/labs/CGI/scratch/testCHORDWdl/PD4116_snv_indel.vcf.gz",
+  "CHORD.svFile": "/.mounts/labs/CGI/scratch/testCHORDWdl/PD4116_sv.vcf.gz",
+  "CHORD.script": "/.mounts/labs/CGI/scratch/testCHORDWdl/runCHORDScript.R"
+}
