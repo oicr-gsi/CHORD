@@ -24,8 +24,6 @@ library(CHORD)
 library(BSgenome.Hsapiens.UCSC.hg19)
 options(stringsAsFactors=F)
 
-setwd(getcwd())
-
 vcf_files <- data.frame(
   snv=snv, sv=sv, indel=indel
 )
@@ -50,7 +48,8 @@ for(i in 1:nrow(vcf_files)){
       sample.name=params$sample,
       output.path=out_path, verbose=F, ref.genome = BSgenome.Hsapiens.UCSC.hg19,
       
-      vcf.filters=list(snv="PASS",indel="PASS",sv="PASS") 
+      # need to turn off these filters to predict on test data; if filters on, cannot predict due to <50 indels
+      # vcf.filters=list(snv="PASS",indel="PASS",sv="PASS") 
     )
   }
 }

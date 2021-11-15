@@ -35,7 +35,7 @@ task runCHORD {
         File indelFile
         File svFile
         File script
-        String modules = "rstats/4.0 rcgi-report/0.2 chord/2.0 hg38-refgene/p12 hg19-refgene/p13"
+        String modules = "chord/2.0 hg38-refgene/p12 hg19-refgene/p13"
         Int threads = 8
         Int jobMemory = 64
         Int timeout = 72
@@ -58,8 +58,17 @@ task runCHORD {
         cpu:     "~{threads}"
         timeout: "~{timeout}"
     }
+
+    meta {
+        output_meta {
+            contexts = "contexts text file"
+            predictions = "predictions text file"
+        }
+    }
+
     output {
-        String out = "done"
+        File contexts = "merged_contexts.txt"
+        File predictions = "chord_pred.txt"
     }
 }
 # to validate
