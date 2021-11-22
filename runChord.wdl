@@ -46,6 +46,10 @@ task runCHORD {
         indelFile: "indel VCF filepath"
         svFile: "SV VCF filepath"
         script: "Rscript filepath"
+        modules: "Names and versions of modules to load"
+        threads: "Requested CPU threads"
+        jobMemory: "Memory allocated for this job"
+        timeout: "Hours before task timeout"
     }
 
     command <<<
@@ -71,5 +75,3 @@ task runCHORD {
         File predictions = "chord_pred.txt"
     }
 }
-# to validate
-# java -jar womtool-69.jar validate wdls/runChord.wdl
