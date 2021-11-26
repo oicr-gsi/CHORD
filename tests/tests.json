@@ -1,0 +1,24 @@
+{
+  "defaults": {
+    "description": "CHORD workflow test",
+    "metrics_calculate": "calculate.sh",
+    "metrics_compare": "compare.sh",
+    "output_metrics_dir": "/.mounts/labs/gsi/testdata/arriba/2.0/output_metrics",
+    "parameters": {
+      "wdl_options": {
+        "write_to_cache": false,
+        "read_from_cache": false
+      }
+    }
+  },
+  "tests": [{
+    "id": "PD3905 Test",
+    "parameters": {
+      "wdl_inputs": {
+        "CHORD.outputFileNamePrefix": "PD3905",
+        "CHORD.inputBam": "/.mounts/labs/gsi/testdata/arriba/2.0/input_data/EPT105.Aligned.sortedByCoord.out.bam",
+        "CHORD.indexBam": "/.mounts/labs/gsi/testdata/arriba/2.0/input_data/EPT105.Aligned.sortedByCoord.out.bai"
+      }
+    }
+  }]
+}
