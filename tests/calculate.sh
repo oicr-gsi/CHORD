@@ -5,6 +5,5 @@ set -o pipefail
 
 cd $1
 
-find . -regex '.*\.fusions.tsv$' -exec wc -l {} \;
-find . -regex '.*\.fusions.discarded.tsv$' -exec wc -l {} \;
-ls | sed 's/.*\.//' | sort | uniq -c
+find . -regex 'chord_pred.txt$' -exec wc -l {} \;
+cat chord_pred.txt | cut -f 1-7 | md5sum

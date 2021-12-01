@@ -3,7 +3,7 @@
     "description": "CHORD workflow test",
     "metrics_calculate": "calculate.sh",
     "metrics_compare": "compare.sh",
-    "output_metrics_dir": "/.mounts/labs/gsi/testdata/arriba/2.0/output_metrics",
+    "output_metrics_dir": "/.mounts/labs/gsi/testdata/chord/1.0/output_metrics",
     "parameters": {
       "wdl_options": {
         "write_to_cache": false,
@@ -11,14 +11,61 @@
       }
     }
   },
-  "tests": [{
-    "id": "PD3905 Test",
-    "parameters": {
-      "wdl_inputs": {
-        "CHORD.outputFileNamePrefix": "PD3905",
-        "CHORD.inputBam": "/.mounts/labs/gsi/testdata/arriba/2.0/input_data/EPT105.Aligned.sortedByCoord.out.bam",
-        "CHORD.indexBam": "/.mounts/labs/gsi/testdata/arriba/2.0/input_data/EPT105.Aligned.sortedByCoord.out.bai"
+  "tests": [
+    {
+      "id": "PD3905 Test",
+      "parameters": {
+        "wdl_inputs": {
+          "CHORD.snvFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD3905_snv_indel.vcf.gz",
+          "CHORD.indelFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD3905_snv_indel.vcf.gz",
+          "CHORD.svFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD3905_sv.vcf.gz",
+          "CHORD.script": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/runCHORDScript.R"
+        }
+      }
+    },
+    {
+      "id": "PD4116 Test",
+      "parameters": {
+        "wdl_inputs": {
+          "CHORD.snvFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD4116_snv_indel.vcf.gz",
+          "CHORD.indelFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD4116_snv_indel.vcf.gz",
+          "CHORD.svFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD4116_sv.vcf.gz",
+          "CHORD.script": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/runCHORDScript.R"
+        }
+      }
+    },
+    {
+      "id": "PD7344 Test",
+      "parameters": {
+        "wdl_inputs": {
+          "CHORD.snvFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD7344_snv_indel.vcf.gz",
+          "CHORD.indelFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD7344_snv_indel.vcf.gz",
+          "CHORD.svFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD7344_sv.vcf.gz",
+          "CHORD.script": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/runCHORDScript.R"
+        }
+      }
+    },
+    {
+      "id": "PD10010 Test",
+      "parameters": {
+        "wdl_inputs": {
+          "CHORD.snvFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD10010_snv_indel.vcf.gz",
+          "CHORD.indelFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD10010_snv_indel.vcf.gz",
+          "CHORD.svFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD10010_sv.vcf.gz",
+          "CHORD.script": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/runCHORDScript.R"
+        }
+      }
+    },
+    {
+      "id": "PD11352 Test",
+      "parameters": {
+        "wdl_inputs": {
+          "CHORD.snvFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD11352_snv_indel.vcf.gz",
+          "CHORD.indelFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD11352_snv_indel.vcf.gz",
+          "CHORD.svFile": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/PD11352_sv.vcf.gz",
+          "CHORD.script": "/.mounts/labs/gsi/testdata/chord/1.0/input_data/runCHORDScript.R"
+        }
       }
     }
-  }]
+  ]
 }
