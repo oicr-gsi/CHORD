@@ -70,7 +70,7 @@ predictionOutputFileName <- "chord_predictions.txt"
 write.table(merged_contexts, paste0("output", "/", mergedContextsFileName), sep='\t', quote=F)
 
 chord_output <- chordPredict(merged_contexts, do.bootstrap=T, verbose=F)
-write.table(chord_output, paste0("output", "/", predictionOutputFileName), sep='\t', quote=F)
+write.table(chord_output, paste0("output", "/", predictionOutputFileName), sep='\t', quote=F, row.names = FALSE)
 
 if (file.exists(paste0("output", "/", predictionOutputFileName))) {
   paste("Prediction outputs written to", predictionOutputFileName)
