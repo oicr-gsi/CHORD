@@ -24,8 +24,6 @@ workflow hrdPredictor {
     	vcfFile: "Input VCF file"
     	vcfIndex: "Input VCF index file"
     	targetBed: "Target bed file"
-    	toMAF: "If true, generate the MAF file"
-    	onlyTumor: "If true, run tumor only mode"
   	}
 
 	meta {
@@ -36,19 +34,19 @@ workflow hrdPredictor {
     	[
       		{
         		name: gatk/4.2.0.0",
-        		url: ""
+        		url: "https://github.com/broadinstitute/gatk/releases"
       		},
       		{
         		name: "bcftools/1.9",
-        		url: ""
+        		url: "https://samtools.github.io/bcftools/"
       		},
       		{
         		name: "bedtools/2.27.1",
-        		url: ""
+        		url: "https://bedtools.readthedocs.io/en/latest/content/installation.html"
       		},
       		{
-        		name: "R",
-        		url: ""
+        		name: "R/4.1.2",
+        		url: "https://cran.r-project.org/mirrors.html"
       		}
     	]
     	output_meta: {
