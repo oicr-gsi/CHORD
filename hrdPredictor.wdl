@@ -33,7 +33,7 @@ workflow hrdPredictor {
     	dependencies: 
     	[
       		{
-        		name: gatk/4.2.0.0",
+        		name: "gatk/4.2.0.0",
         		url: "https://github.com/broadinstitute/gatk/releases"
       		},
       		{
