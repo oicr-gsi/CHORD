@@ -26,3 +26,7 @@ contexts <- extractSigsChord(
 
 chord_output <- chordPredict(contexts, do.bootstrap=T, verbose=T)
 
+write.table(
+  chord_output,
+  file = paste(snvFile_loc,".CHORD.hrd.txt")
+)

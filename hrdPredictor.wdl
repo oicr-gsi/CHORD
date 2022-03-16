@@ -199,12 +199,13 @@ task hrdResults {
 	}
 
 	output {
-	
+		File hrdOutput = "~{basename}.CHORD.hrd.txt"
+
 	}
 
 	meta {
     	output_meta: {
-
+      		hrdOutput: "HRD score and confidence as .txt file as estimated by CHORD"
 	    }
 	}
 }
