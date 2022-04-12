@@ -1,4 +1,4 @@
-workflow hrdPredictor {
+workflow CHORD {
 
 	input {
     	File snvVcfFile
