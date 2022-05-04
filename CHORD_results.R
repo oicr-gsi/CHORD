@@ -24,5 +24,8 @@ chord_output <- chordPredict(contexts, do.bootstrap=T, verbose=T)
 
 write.table(
   chord_output,
-  file = paste0(basename,".CHORD.hrd.txt")
+  file = paste0(basename,".CHORD.hrd.txt"),
+  append = F, quote = FALSE, sep = "\t", 
+  eol = "\n", na = "NA",dec = ".", row.names = FALSE, 
+  col.names = TRUE
 )
