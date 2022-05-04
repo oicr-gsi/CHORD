@@ -1,0 +1,8 @@
+{
+  "CHORD.rScript": "/.mounts/labs/CGI/scratch/fbeaudry/CHORD/CHORD_results.R",
+  "CHORD.filterSmalls.VAF": "05",
+  "CHORD.filterSmalls.difficultRegions": "--exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed",
+  "CHORD.structuralVcfFile": "/.mounts/labs/CGI/scratch/fbeaudry/CHORD_test/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4_somatic.somatic_filtered.delly.merged.vcf.gz",
+  "CHORD.smallsVcfFile": "/.mounts/labs/CGI/scratch/fbeaudry/CHORD_test/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz",
+  "CHORD.smallsVcfFileIndex": "/.mounts/labs/CGI/scratch/fbeaudry/CHORD_test/PANX_1309/PANX_1309_Lv_M_WG_100-PM-033_LCM4.filter.deduped.realigned.recalibrated.mutect2.filtered.vcf.gz.tbi"
+}

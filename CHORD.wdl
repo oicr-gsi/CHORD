@@ -2,9 +2,10 @@ version 1.0
 
 workflow CHORD {
 	input {
-		File smallsVcfFileIndex
+		File smallsVcfFile
 		File smallsVcfFileIndex
 		File structuralVcfFile
+		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String rScript
 	}
 
@@ -23,7 +24,8 @@ workflow CHORD {
 		input:	
 		smallsVcffiltered = filterSmalls.smallsVcffiltered,
 		structuralbedpe = filterStructural.structuralbedpe,
-		rScript = rScript
+		rScript = rScript,
+		basename = basename
 	}
 
 	parameter_meta {
@@ -71,7 +73,6 @@ task filterStructural {
 		File structuralVcfFile 
 		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
 		String modules = "bcftools/1.9"
-		String sampleName
 		Int jobMemory = 5
 		Int threads = 1
 		Int timeout = 1
@@ -81,7 +82,6 @@ task filterStructural {
 		structuralVcfFile: "Vcf input file"
 		basename: "Base name"
 		modules: "Required environment modules"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -118,10 +118,10 @@ task filterStructural {
 task filterSmalls {
 	input {
 		File smallsVcfFile
-		File smallsVcfIndex
+		File smallsVcfFileIndex
+		String smallsFilter = "'PASS,clustered_events,slippage'"
 		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
 		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 hg38/p12 grch38-alldifficultregions/3.0"
-		String sampleName
 		String genome = "$HG38_ROOT/hg38_random.fa"
 		String? difficultRegions
 		String VAF
@@ -134,7 +134,6 @@ task filterSmalls {
 		smallsVcfFile: "Vcf input file"
 		basename: "Base name"
 		modules: "Required environment modules"
-		sampleName: "Name of sample matching the tumor sample in .vcf"
 		genome: "Path to loaded genome"
 		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
 		VAF: "VAF for indels"
@@ -151,14 +150,14 @@ task filterSmalls {
 		-R ~{genome} ~{difficultRegions} \
 		-O ~{basename}.vcf  
 
-		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" >~{basename}.VAF.vcf
+		$BCFTOOLS_ROOT/bin/bcftools view -f ~{smallsFilter} ~{basename}.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" >~{basename}.VAF.vcf
 
 		bgzip ~{basename}.VAF.vcf
 		tabix -p vcf ~{basename}.VAF.vcf.gz
 
-		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
-		awk '$1 !~ "#" {print}' ~{basename}.vcf | wc -l >>~{sampleName}.filteringReport.txt
-		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{basename}.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.vcf | wc -l >>~{basename}.filteringReport.txt
+		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{basename}.filteringReport.txt
 
 	>>> 
 
@@ -172,7 +171,7 @@ task filterSmalls {
 	output {
 		File smallsVcffiltered = "~{basename}.VAF.vcf.gz"
 		File smallsVcfIndexfiltered = "~{basename}.VAF.vcf.gz.tbi"
-		File smallsFilteringReport = "~{sampleName}.filteringReport.txt"
+		File smallsFilteringReport = "~{basename}.filteringReport.txt"
 	}
 
 	meta {
@@ -186,8 +185,9 @@ task filterSmalls {
 
 task hrdResults {
 	input {
-		file smallsVcffiltered
-		file structuralbedpe
+		File smallsVcffiltered
+		File structuralbedpe
+		String basename 
 		String rScript
 		String modules = "chord/2.0"
 		Int jobMemory = 32
@@ -196,8 +196,8 @@ task hrdResults {
 	}
 
 	parameter_meta {
-		snvVcfFiltered: "filtered SNV Vcf input file"
-		structuralVcfFiltered: "filtered structural variant Vcf input file"
+		smallsVcffiltered: "filtered SNV Vcf input file"
+		structuralbedpe: "filtered structural variant bedpe input file"
 		modules: "Required environment modules"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
@@ -207,7 +207,7 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla ~{rScript} ~{smallsVcffiltered} ~{structuralbedpe}
+		Rscript --vanilla ~{rScript} ~{smallsVcffiltered} ~{structuralbedpe} ~{basename}
 
 	>>> 
 
