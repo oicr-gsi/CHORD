@@ -7,6 +7,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 snvFile_loc <- args[1]
 structuralFile_loc <- args[2]
+basename <- args[3]
   
 structuraldf <- read.table(structuralFile_loc)[,c(4:5)]
 names(structuraldf) <- c("sv_type", "sv_len") 
@@ -23,5 +24,5 @@ chord_output <- chordPredict(contexts, do.bootstrap=T, verbose=T)
 
 write.table(
   chord_output,
-  file = paste(snvFile_loc,".CHORD.hrd.txt")
+  file = paste0(basename,".CHORD.hrd.txt")
 )
