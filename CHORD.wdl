@@ -1,134 +1,87 @@
-workflow CHORD {
+version 1.0
 
+workflow CHORD {
 	input {
-    	File snvVcfFile
-    	File snvVcfIndex
-    	File structuralVcfFile
-    	File structuralVcfIndex
+		File smallsVcfFileIndex
+		File smallsVcfFileIndex
+		File structuralVcfFile
+		String rScript
 	}
 
-	call filterSNVs {
-		input: vcfFile = snvVcfFile
+	call filterSmalls {
+		input:
+		smallsVcfFile = smallsVcfFile,
+		smallsVcfFileIndex = smallsVcfFileIndex
 	}
 
 	call filterStructural {
-		input: vcfFile = structuralVcfFile
+		input: 
+		structuralVcfFile = structuralVcfFile
 	}
 
 	call hrdResults {
-		input:	snvVcfFiltered = filterSNVs.snvVcfOutput
-				structuralVcfFiltered = filterStructural.structuralVcfOutput
+		input:	
+		smallsVcffiltered = filterSmalls.smallsVcffiltered,
+		structuralbedpe = filterStructural.structuralbedpe,
+		rScript = rScript
 	}
 
 	parameter_meta {
-    	vcfFile: "Input VCF file"
-    	vcfIndex: "Input VCF index file"
-    	targetBed: "Target bed file"
-  	}
+		smallsVcfFile: "Input VCF file of small mutations, eg from mutect2"
+		smallsVcfFileIndex: "Index for VCF file of small mutations"
+		structuralVcfFile: "Input VCF file"
+		rScript: "Temporary variable to call the .R script containing CHORD, will be modulated. default: ~/CHORD/CHORD_results.R"
+	}
 
 	meta {
-    	author: "Felix Beaudry, Alex Fortuna"
-    	email: "fbeaudry@oicr.on.ca"
-    	description: "Homolog Recombination Deficiency Prediction Workflow"
-    	dependencies: 
-    	[
-      		{
-        		name: "gatk/4.2.0.0",
-        		url: "https://github.com/broadinstitute/gatk/releases"
-      		},
-      		{
-        		name: "bcftools/1.9",
-        		url: "https://samtools.github.io/bcftools/"
-      		},
-      		{
-        		name: "bedtools/2.27.1",
-        		url: "https://bedtools.readthedocs.io/en/latest/content/installation.html"
-      		},
-      		{
-        		name: "R/4.1.2",
-        		url: "https://cran.r-project.org/mirrors.html"
-      		}
-    	]
-    	output_meta: {
-   			
-    	}
+		author: "Felix Beaudry, Alex Fortuna"
+		email: "fbeaudry@oicr.on.ca"
+		description: "Homolog Recombination Deficiency Prediction Workflow"
+		dependencies: 
+		[
+			{
+				name: "gatk/4.2.0.0",
+				url: "https://github.com/broadinstitute/gatk/releases"
+			},
+			{
+				name: "bcftools/1.9",
+				url: "https://samtools.github.io/bcftools/"
+			},
+			{
+				name: "bedtools/2.27.1",
+				url: "https://bedtools.readthedocs.io/en/latest/content/installation.html"
+			},
+			{
+				name: "R/4.1.2",
+				url: "https://cran.r-project.org/mirrors.html"
+			}
+		]
+		output_meta: {
+			hrdOutput: "HRD score and confidence as .txt file as estimated by CHORD"
+		}
 	}
 
 	output {
-		
-
-  }
+		File hrdOutput = "~{basename}.CHORD.hrd.txt"
+	}
 }
-
-task filterSNVs {
- 	input {
-	    File vcfFile 
-	    String basename = basename("~{vcfFile}", ".vcf.gz")
-	    String ncbiBuild
-	    String referenceFasta
-	    String modules = "gatk/4.2.0.0 bcftools/1.9"
-	    Int jobMemory = 32
-	    Int threads = 4
-	    Int timeout = 16
-	 }
-
-	parameter_meta {
-	    vcfFile: "Vcf input file"
-	    basename: "Base name"
-	    ncbiBuild: "The assembly version"
-	    referenceFasta: "Reference fasta file"
-	    modules: "Required environment modules"
-	    jobMemory: "Memory allocated for this job (GB)"
-	    threads: "Requested CPU threads"
-	    timeout: "Hours before task timeout"
-	}
-
-	command <<<
-	    set -euo pipefail
-
-		gatk SelectVariants -R ~{referenceFasta} \
-			--exclude-intervals GRCh38_alldifficultregions.bed \
-			-V ~{SNVvcfFile} \
-			-sn ~{tumor}  -O ~{basename}.wellMapped.vcf
-
-		bcftools filter -i '(FORMAT/AD[0:1]*100)/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 10'\
-			~{basename}.wellMapped.vcf >~{basename}.wellMapped.MAF.vcf
-
-	>>> 
-
-	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
-	}
-
-	output {
-    	File snvVcfOutput = "~{basename}.wellMapped.MAF.vcf"
-	}
-	
-	meta {
-	    	output_meta: {
-      		snvVcfOutput: "filtered SNV VCF output"
-    	}
-  	}
-}
-
 
 task filterStructural {
 	input {
-		File vcfFile 
-		String basename = basename("~{vcfFile}", ".vcf.gz")
-		String modules = "bedtools/2.27.1"
-		Int jobMemory = 32
-		Int threads = 4
-		Int timeout = 16
+		File structuralVcfFile 
+		String basename = basename("~{structuralVcfFile}", ".vcf.gz")
+		String modules = "bcftools/1.9"
+		String sampleName
+		Int jobMemory = 5
+		Int threads = 1
+		Int timeout = 1
 	}
 
 	parameter_meta {
-		vcfFile: "Vcf input file"
+		structuralVcfFile: "Vcf input file"
 		basename: "Base name"
 		modules: "Required environment modules"
+		sampleName: "Name of sample matching the tumor sample in .vcf"
 		jobMemory: "Memory allocated for this job (GB)"
 		threads: "Requested CPU threads"
 		timeout: "Hours before task timeout"
@@ -137,39 +90,106 @@ task filterStructural {
 	command <<<
 		set -euo pipefail
 
-		zcat ${vcfFile} | awk '$7 ~ "PASS" {print}'  | \
-			awk '  split($8,a,";") split(a[4],b,"=") {print $1"\t"$2"\t"b[2]"\t"$5"\t"b[2]-$2}' | \
-			awk '$4 !~ ":" {print}' | awk '$4 !~ "INS" {print}' | \
-			sed 's/<//g; s/>//g' >~{basename}.lengths.bed
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS' ~{structuralVcfFile} |\
+		$BCFTOOLS_ROOT/bin/bcftools filter -e 'INFO/SVTYPE = "BND"' |\
+		$BCFTOOLS_ROOT/bin/bcftools query -f "%CHROM\t%POS\t%INFO/END\t%INFO/SVTYPE\n" |\
+		awk '{print $1"\t"$2"\t"$3"\t"$4"\t"$3-$2} ' >~{basename}.lengths.bed 
 
-		bedtools intersect -a ~{basename}.lengths.bed \
-			-b GRCh38_notinalldifficultregions.bed -u  >~{basename}.lengths.wellMapped.bed 
+	>>>
+
+	runtime {
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
+	}
+
+	output {
+		File structuralbedpe = "~{basename}.lengths.bed"
+	}
+
+	meta {
+		output_meta: {
+			structuralbedpe: "filtered structural .bedpe with lengths",
+		}
+	}
+}
+
+task filterSmalls {
+	input {
+		File smallsVcfFile
+		File smallsVcfIndex
+		String basename = basename("~{smallsVcfFile}", ".vcf.gz")
+		String modules = "gatk/4.2.0.0 tabix/1.9 bcftools/1.9 hg38/p12 grch38-alldifficultregions/3.0"
+		String sampleName
+		String genome = "$HG38_ROOT/hg38_random.fa"
+		String? difficultRegions
+		String VAF
+		Int jobMemory = 10
+		Int threads = 1
+		Int timeout = 2
+	}
+
+	parameter_meta {
+		smallsVcfFile: "Vcf input file"
+		basename: "Base name"
+		modules: "Required environment modules"
+		sampleName: "Name of sample matching the tumor sample in .vcf"
+		genome: "Path to loaded genome"
+		difficultRegions: "Path to .bed of difficult regions to align to, string must include the --exclude-intervals flag, eg: --exclude-intervals $GRCH38_ALLDIFFICULTREGIONS_ROOT/GRCh38_alldifficultregions.bed"
+		VAF: "VAF for indels"
+		jobMemory: "Memory allocated for this job (GB)"
+		threads: "Requested CPU threads"
+		timeout: "Hours before task timeout"
+	}
+
+	command <<<
+		set -euo pipefail
+
+		gatk SelectVariants \
+		-V ~{smallsVcfFile} \
+		-R ~{genome} ~{difficultRegions} \
+		-O ~{basename}.vcf  
+
+		$BCFTOOLS_ROOT/bin/bcftools view -f 'PASS,clustered_events' ~{basename}.vcf  |  $BCFTOOLS_ROOT/bin/bcftools filter -i "(FORMAT/AD[0:1])/(FORMAT/AD[0:0]+FORMAT/AD[0:1]) >= 0.~{VAF}" >~{basename}.VAF.vcf
+
+		bgzip ~{basename}.VAF.vcf
+		tabix -p vcf ~{basename}.VAF.vcf.gz
+
+		zcat ~{smallsVcfFile} | awk '$1 !~ "#" {print}'  | wc -l >~{sampleName}.filteringReport.txt
+		awk '$1 !~ "#" {print}' ~{basename}.vcf | wc -l >>~{sampleName}.filteringReport.txt
+		zcat ~{basename}.VAF.vcf.gz | awk '$1 !~ "#" {print}'  | wc -l >>~{sampleName}.filteringReport.txt
 
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory: "~{jobMemory} GB"
+		cpu: "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
-    	File structuralVcfOutput = "~{basename}.lengths.wellMapped.bed"
+		File smallsVcffiltered = "~{basename}.VAF.vcf.gz"
+		File smallsVcfIndexfiltered = "~{basename}.VAF.vcf.gz.tbi"
+		File smallsFilteringReport = "~{sampleName}.filteringReport.txt"
 	}
 
 	meta {
-    	output_meta: {
-      		structuralVcfOutput: "filtered structural VCF output"
-    	}
-  	}
+		output_meta: {
+			indelVcfOutput: "filtered INDEL .vcf",
+			indelVcfIndexOutput: "filtered INDEL .vcf.tbi indexed",
+			indelFilteringReport: "counts of variants pre and post filtering"
+		}
+	}
 }
 
 task hrdResults {
 	input {
-		file snvVcfFiltered
-		file structuralVcfFiltered
-		String modules = "R"
+		file smallsVcffiltered
+		file structuralbedpe
+		String rScript
+		String modules = "chord/2.0"
 		Int jobMemory = 32
 		Int threads = 4
 		Int timeout = 16
@@ -187,26 +207,24 @@ task hrdResults {
 	command <<<
 		set -euo pipefail
 
-		Rscript --vanilla CHORD_results.R ~{snvVcfFiltered} ~{structuralVcfFiltered}
+		Rscript --vanilla ~{rScript} ~{smallsVcffiltered} ~{structuralbedpe}
 
 	>>> 
 
 	runtime {
-	    modules: "~{modules}"
-	    memory:  "~{jobMemory} GB"
-	    cpu:     "~{threads}"
-	    timeout: "~{timeout}"
+		modules: "~{modules}"
+		memory:  "~{jobMemory} GB"
+		cpu:     "~{threads}"
+		timeout: "~{timeout}"
 	}
 
 	output {
 		File hrdOutput = "~{basename}.CHORD.hrd.txt"
-
 	}
 
 	meta {
-    	output_meta: {
-      		hrdOutput: "HRD score and confidence as .txt file as estimated by CHORD"
-	    }
+		output_meta: {
+			hrdOutput: "HRD score and confidence as .txt file as estimated by CHORD"
+		}
 	}
 }
-
